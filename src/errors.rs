@@ -10,9 +10,6 @@ pub enum ServiceError {
     #[error("BadRequest: {0}")]
     BadRequest(String),
 
-    #[error("Unauthorized")]
-    Unauthorized,
-
     #[error("Unable to connect to DB")]
     UnableToConnectToDb,
 }
@@ -24,18 +21,9 @@ impl ResponseError for ServiceError {
             ServiceError::InternalServerError => HttpResponse::InternalServerError().json("Internal Server Error, Please try later"),
             ServiceError::UnableToConnectToDb => HttpResponse::InternalServerError().json("Unable to connect to DB, Please try later"),
             ServiceError::BadRequest(ref message) => HttpResponse::BadRequest().json(message),
-            ServiceError::Unauthorized => HttpResponse::Unauthorized().json("Unauthorized"),
         }
     }
 }
-
-// we can return early in our handlers if UUID provided by the user is not valid
-// // and provide a custom message
-// impl From<uuid::parser::ParseError> for ServiceError {
-//     fn from(_: uuid::parser::ParseError) -> ServiceError {
-//         ServiceError::BadRequest("Invalid UUID".into())
-//     }
-// }
 
 impl From<DBError> for ServiceError {
     fn from(error: DBError) -> ServiceError {

@@ -1,5 +1,4 @@
 use super::{ConnectionManager, Pool, PoolError};
-use diesel::Connection;
 
 fn init_pool(database_url: &str) -> Result<Pool, PoolError> {
     let manager = ConnectionManager::new(database_url);

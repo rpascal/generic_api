@@ -1,7 +1,7 @@
 use crate::errors::ServiceError;
 
 pub mod pool;
-
+pub mod schema;
 use diesel::r2d2::PoolError;
 
 type ConnectionManager = diesel::r2d2::ConnectionManager<diesel::pg::PgConnection>;

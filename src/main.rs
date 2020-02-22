@@ -1,9 +1,8 @@
-// #[macro_use]
+#[macro_use]
 extern crate diesel;
 
 #[macro_use]
 extern crate serde_derive;
-
 
 mod database;
 mod errors;

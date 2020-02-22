@@ -1,6 +1,4 @@
-use actix_web::{Responder, HttpRequest, web};
-use actix_web::web::Data;
-use crate::database::Pool;
+use actix_web::{Responder, web};
 
 pub fn route(cfg: &mut web::ServiceConfig) {
     cfg.service(
