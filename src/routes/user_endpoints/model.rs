@@ -14,7 +14,7 @@ pub struct UserEndpoint {
     pub id: i32,
 }
 
-#[derive(Debug, Insertable)]
+#[derive(Debug, Serialize, Deserialize, Insertable)]
 #[table_name = "user_endpoints"]
 pub struct InsertableUserEndpoint  {
     pub key:  uuid::Uuid,
