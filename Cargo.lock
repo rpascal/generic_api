@@ -812,6 +812,7 @@ dependencies = [
  "actix-http",
  "actix-identity",
  "actix-rt",
+ "actix-service",
  "actix-web",
  "anyhow",
  "argon2rs",

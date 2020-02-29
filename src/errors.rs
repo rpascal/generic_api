@@ -25,6 +25,12 @@ impl ResponseError for ServiceError {
     }
 }
 
+impl From<uuid::parser::ParseError> for ServiceError {
+    fn from(_: uuid::parser::ParseError) -> ServiceError {
+        ServiceError::BadRequest("Invalid UUID".into())
+    }
+}
+
 impl From<DBError> for ServiceError {
     fn from(error: DBError) -> ServiceError {
         // Right now we just care about UniqueViolation from diesel
