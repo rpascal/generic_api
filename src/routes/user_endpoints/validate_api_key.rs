@@ -2,14 +2,15 @@ use std::task::{Context, Poll};
 
 use actix_service::{Service, Transform};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
-use actix_web::{Error, HttpResponse};
+use actix_web::{Error};
 use futures::future::{ok, Either, Ready};
 use actix_web::web::Data;
 use crate::database::{Pool, db_connection};
-use crate::routes::user_endpoints::model::UserEndpoint;
+use crate::routes::user_endpoints::model::ApiKey;
 use uuid::Uuid;
 use crate::errors::ServiceError;
 use diesel::{QueryDsl, ExpressionMethods, RunQueryDsl};
+use actix_http::http::HeaderMap;
 
 pub struct ValidateApiKey;
 
@@ -56,37 +57,39 @@ impl<S, B> Service for ValidateApiKeyMiddleware<S>
                 Either::Left(self.service.call(req))
             }
             Err(_e) => {
-                Either::Right(ok(req.into_response(
-                    HttpResponse::Unauthorized().finish().into_body(),
+                Either::Right(ok(req.error_response(
+                    _e,
                 )))
             }
         }
     }
 }
 
-fn get_api_key(req: &ServiceRequest) -> Result<Uuid, ServiceError> {
-    if let Some(a) = req.headers().get("apikey").ok_or_else(|| ServiceError::InternalServerError)?.to_str().ok() {
+pub fn get_api_key_from_header_map(header_map: &HeaderMap) -> Result<Uuid, ServiceError> {
+    if let Some(a) = header_map.get("api_key").ok_or_else(|| ServiceError::BadRequest(String::from("No header with api_key found")))?.to_str().ok() {
         return Ok(Uuid::parse_str(a)?);
     }
-    return Err(ServiceError::InternalServerError);
+    return Err(ServiceError::BadRequest(String::from("No header with api_key found")));
 }
 
 fn api_key_validation(req: &ServiceRequest, pool: Option<Data<Pool>>) -> Result<(), ServiceError> {
+    let header_api_key = get_api_key_from_header_map(req.headers())?;
+
     if let Some(p) = pool {
         let conn = &db_connection(&p)?;
-        use crate::database::schema::user_endpoints::{table, key};
+        use crate::database::schema::api_keys::{table, api_key};
 
-        let api_key = get_api_key(&req)?;
 
-        println!("Found api_key {}", api_key);
-        let results = table.filter(key.eq(api_key))
+        println!("Found api_key {}", header_api_key);
+        let results = table.filter(api_key.eq(header_api_key))
             .limit(1)
-            .load::<UserEndpoint>(conn)
+            .load::<ApiKey>(conn)
             .expect("Error loading posts");
 
         if results.len() > 0 {
             return Ok(());
         }
     }
-    return Err(ServiceError::InternalServerError);
+
+    return Err(ServiceError::Unauthorized(format!("Bad api_key: {0}", header_api_key.to_string())));
 }
