@@ -43,7 +43,8 @@ impl From<DBError> for ServiceError {
                 let message = info.details().unwrap_or_else(|| info.message()).to_string();
                 println!("DBError message {0}", message);
                 ServiceError::BadRequest(message)
-            }
+            },
+            DBError::NotFound =>  ServiceError::BadRequest(String::from("Resource not found in database")),
             _ => ServiceError::InternalServerError,
         }
     }
