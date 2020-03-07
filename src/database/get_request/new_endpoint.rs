@@ -1,12 +1,12 @@
 use actix_web::web::{Data};
 use crate::database::{db_connection, Pool};
 use crate::errors::{ServiceResult};
-use crate::routes::user_endpoints::model::{GetRequest, BasicGetRequest};
+use super::model::{GetRequest, BasicGetRequest};
 
 use diesel::RunQueryDsl;
 use uuid::Uuid;
 
-pub fn new_endpoint(header_api_key: Uuid, pool: Data<Pool>, body: BasicGetRequest) -> ServiceResult<GetRequest> {
+pub fn execute(header_api_key: Uuid, pool: Data<Pool>, body: BasicGetRequest) -> ServiceResult<GetRequest> {
     use crate::database::schema::get_requests::table;
 
     let conn = &db_connection(&pool)?;

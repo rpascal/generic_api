@@ -5,11 +5,9 @@ use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::{Error};
 use futures::future::{ok, Either, Ready};
 use actix_web::web::Data;
-use crate::database::{Pool, db_connection};
-use crate::routes::user_endpoints::model::ApiKey;
+use crate::database::{Pool, api_key};
 use uuid::Uuid;
 use crate::errors::ServiceError;
-use diesel::{QueryDsl, ExpressionMethods, RunQueryDsl};
 use actix_http::http::HeaderMap;
 
 pub struct ValidateApiKey;
@@ -50,7 +48,7 @@ impl<S, B> Service for ValidateApiKeyMiddleware<S>
     }
 
     fn call(&mut self, req: ServiceRequest) -> Self::Future {
-        let pool = req.app_data::<Pool>();
+        let pool: Option<Data<Pool>> = req.app_data::<Pool>();
 
         match api_key_validation(&req, pool) {
             Ok(()) => {
@@ -62,6 +60,7 @@ impl<S, B> Service for ValidateApiKeyMiddleware<S>
                 )))
             }
         }
+
     }
 }
 
@@ -72,24 +71,17 @@ pub fn get_api_key_from_header_map(header_map: &HeaderMap) -> Result<Uuid, Servi
     return Err(ServiceError::BadRequest(String::from("No header with api_key found")));
 }
 
+
 fn api_key_validation(req: &ServiceRequest, pool: Option<Data<Pool>>) -> Result<(), ServiceError> {
     let header_api_key = get_api_key_from_header_map(req.headers())?;
 
-    if let Some(p) = pool {
-        let conn = &db_connection(&p)?;
-        use crate::database::schema::api_keys::{table, api_key};
-
-
-        println!("Found api_key {}", header_api_key);
-        let results = table.filter(api_key.eq(header_api_key))
-            .limit(1)
-            .load::<ApiKey>(conn)
-            .expect("Error loading posts");
-
-        if results.len() > 0 {
+    if let Some(pl) = pool {
+        if let Ok(()) = api_key::api_key_validation::execute(header_api_key, &pl) {
             return Ok(());
         }
     }
 
     return Err(ServiceError::Unauthorized(format!("Bad api_key: {0}", header_api_key.to_string())));
 }
+
+
