@@ -10,7 +10,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: pgadmin@genericapi.com
       PGADMIN_DEFAULT_PASSWORD: password
 #    volumes:
-#      - ./database/.pgadmin:/var/lib/pgadmin
+#      - ./docker/database/.pgadmin:/var/lib/pgadmin
     networks:
       - postgres
   postgres:
@@ -27,8 +27,8 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: generic_api
 #    volumes:
-#      - ./database/init_scripts:/docker-entrypoint-initdb.d/
-#      - ./database/.data:/var/lib/postgresql/data
+#      - ./docker/database/init_scripts:/docker-entrypoint-initdb.d/
+#      - ./docker/database/.data:/var/lib/postgresql/data
     ports:
       - 5432:5432
     networks:

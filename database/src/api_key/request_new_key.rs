@@ -1,11 +1,11 @@
-use crate::database::{db_connection, Pool};
-use crate::errors::ServiceResult;
+use crate::{Pool, db_connection};
+use crate::errors::DatabaseResult;
 use super::model::ApiKey;
 
 use diesel::RunQueryDsl;
 
-pub fn execute(pool: &Pool) -> ServiceResult<ApiKey> {
-    use crate::database::schema::api_keys::table;
+pub fn execute(pool: &Pool) -> DatabaseResult<ApiKey> {
+    use crate::schema::api_keys::table;
 
     let conn = &db_connection(pool)?;
 

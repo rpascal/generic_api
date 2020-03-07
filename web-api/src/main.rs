@@ -1,10 +1,8 @@
 #[macro_use]
-extern crate diesel;
-
-#[macro_use]
 extern crate serde_derive;
 
-mod database;
+use database;
+
 mod errors;
 mod routes;
 mod configuration;
@@ -45,7 +43,7 @@ async fn main() -> std::io::Result<()> {
 
     let port = args.port;
 
-    let pool = database::pool::establish_connection(args.clone());
+    let pool = database::pool::establish_connection(&args.clone().database_url);
 
     let server = HttpServer::new(move || {
         App::new()

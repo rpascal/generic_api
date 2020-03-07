@@ -5,10 +5,10 @@ use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::{Error};
 use futures::future::{ok, Either, Ready};
 use actix_web::web::Data;
-use crate::database::{Pool, api_key};
 use uuid::Uuid;
 use crate::errors::ServiceError;
 use actix_http::http::HeaderMap;
+use database::{Pool, api_key};
 
 pub struct ValidateApiKey;
 

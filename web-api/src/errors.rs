@@ -1,6 +1,6 @@
 use actix_web::{error::ResponseError, HttpResponse};
-use diesel::result::{Error as DBError};
 use thiserror::Error;
+use database::errors::DatabaseError;
 
 #[derive(Debug, Error, Serialize)]
 pub enum ServiceError {
@@ -29,25 +29,21 @@ impl ResponseError for ServiceError {
     }
 }
 
+impl From<DatabaseError> for ServiceError {
+    fn from(db_error: DatabaseError) -> ServiceError {
+        match db_error {
+            DatabaseError::InternalServerError => ServiceError::InternalServerError,
+            DatabaseError::UnableToConnectToDb => ServiceError::UnableToConnectToDb,
+            DatabaseError::BadRequest(ref message) => ServiceError::BadRequest(String::from(message)),
+            DatabaseError::Unauthorized(ref message) =>  ServiceError::Unauthorized(String::from(message)),
+        }
+    }
+}
+
 impl From<uuid::parser::ParseError> for ServiceError {
     fn from(_: uuid::parser::ParseError) -> ServiceError {
         ServiceError::BadRequest("Invalid UUID".into())
     }
 }
 
-impl From<DBError> for ServiceError {
-    fn from(error: DBError) -> ServiceError {
-        println!("DBError {0}", error);
-        match error {
-            DBError::DatabaseError(_kind, info) => {
-                let message = info.details().unwrap_or_else(|| info.message()).to_string();
-                println!("DBError message {0}", message);
-                ServiceError::BadRequest(message)
-            },
-            DBError::NotFound =>  ServiceError::BadRequest(String::from("Resource not found in database")),
-            _ => ServiceError::InternalServerError,
-        }
-    }
-}
-
-pub type ServiceResult<V> = std::result::Result<V, crate::errors::ServiceError>;
+pub type ServiceResult<V> = std::result::Result<V, ServiceError>;

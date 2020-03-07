@@ -1,5 +1,4 @@
-use crate::database::schema::get_requests;
-
+use crate::schema::get_requests;
 /**
 It is VERY important that the order of the columns match the order of the field
 or else diesel will scream

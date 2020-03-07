@@ -1,12 +1,12 @@
-use crate::database::{Pool, db_connection};
 use uuid::Uuid;
-use crate::errors::ServiceError;
 use super::model::ApiKey;
 use diesel::{QueryDsl, ExpressionMethods, RunQueryDsl};
+use crate::{Pool, db_connection};
+use crate::errors::{DatabaseResult, DatabaseError};
 
-pub fn execute(test_api_key: Uuid, pool: &Pool) -> Result<(), ServiceError> {
+pub fn execute(test_api_key: Uuid, pool: &Pool) -> DatabaseResult<()> {
     let conn = &db_connection(pool)?;
-    use crate::database::schema::api_keys::{table, api_key};
+    use crate::schema::api_keys::{table, api_key};
 
     let results = table.filter(api_key.eq(test_api_key))
         .limit(1)
@@ -17,5 +17,5 @@ pub fn execute(test_api_key: Uuid, pool: &Pool) -> Result<(), ServiceError> {
         return Ok(());
     }
 
-    return Err(ServiceError::Unauthorized(format!("Bad api_key: {0}", test_api_key.to_string())));
+    return Err(DatabaseError::Unauthorized(format!("Bad api_key: {0}", test_api_key.to_string())));
 }

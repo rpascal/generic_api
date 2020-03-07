@@ -5,6 +5,6 @@ fn init_pool(database_url: &str) -> Result<Pool, PoolError> {
     Pool::builder().build(manager)
 }
 
-pub(crate) fn establish_connection(args: crate::CliAndEnvArgs) -> Pool {
-    init_pool(&args.database_url).expect("Failed to create pool")
+pub fn establish_connection(database_url:  &str) -> Pool {
+    init_pool(database_url).expect("Failed to create pool")
 }

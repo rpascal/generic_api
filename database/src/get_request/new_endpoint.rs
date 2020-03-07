@@ -1,15 +1,14 @@
-use actix_web::web::{Data};
-use crate::database::{db_connection, Pool};
-use crate::errors::{ServiceResult};
+use crate::{Pool, db_connection};
+use crate::errors::DatabaseResult;
 use super::model::{GetRequest, BasicGetRequest};
 
 use diesel::RunQueryDsl;
 use uuid::Uuid;
 
-pub fn execute(header_api_key: Uuid, pool: Data<Pool>, body: BasicGetRequest) -> ServiceResult<GetRequest> {
-    use crate::database::schema::get_requests::table;
+pub fn execute(header_api_key: Uuid, pool: &Pool, body: BasicGetRequest) -> DatabaseResult<GetRequest> {
+    use crate::schema::get_requests::table;
 
-    let conn = &db_connection(&pool)?;
+    let conn = &db_connection(pool)?;
 
     let new_get_request : GetRequest = GetRequest {
         api_key: header_api_key,
