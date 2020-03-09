@@ -36,12 +36,13 @@ impl From<DatabaseError> for ServiceError {
             DatabaseError::UnableToConnectToDb => ServiceError::UnableToConnectToDb,
             DatabaseError::BadRequest(ref message) => ServiceError::BadRequest(String::from(message)),
             DatabaseError::Unauthorized(ref message) =>  ServiceError::Unauthorized(String::from(message)),
+            DatabaseError::SerializationError =>  ServiceError::BadRequest(String::from("Serialization Error")),
         }
     }
 }
 
-impl From<uuid::parser::ParseError> for ServiceError {
-    fn from(_: uuid::parser::ParseError) -> ServiceError {
+impl From<uuid::Error> for ServiceError {
+    fn from(_: uuid::Error) -> ServiceError {
         ServiceError::BadRequest("Invalid UUID".into())
     }
 }

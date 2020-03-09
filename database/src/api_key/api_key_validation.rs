@@ -1,20 +1,20 @@
 use uuid::Uuid;
-use super::model::ApiKey;
-use diesel::{QueryDsl, ExpressionMethods, RunQueryDsl};
-use crate::{Pool, db_connection};
+use crate::{Pool, db_connection, system_db};
 use crate::errors::{DatabaseResult, DatabaseError};
+use arangors::AqlQuery;
+use models::api_key::ApiKey;
 
 pub fn execute(test_api_key: Uuid, pool: &Pool) -> DatabaseResult<()> {
-    let conn = &db_connection(pool)?;
-    use crate::schema::api_keys::{table, api_key};
+    let pooled_connection = &db_connection(pool)?;
+    let db = &system_db(pooled_connection)?;
 
-    let results = table.filter(api_key.eq(test_api_key))
-        .limit(1)
-        .load::<ApiKey>(conn)
-        .expect("Error loading posts");
+    let aql = AqlQuery::new("FOR u IN api_keys FILTER u.api_key==@api_key LIMIT 1 RETURN u")
+        .bind_var("api_key", test_api_key.to_string());
 
-    if results.len() > 0 {
-        return Ok(());
+    if let Ok(resp) = db.aql_query::<ApiKey>(aql) {
+        if !resp.is_empty() {
+            return Ok(());
+        }
     }
 
     return Err(DatabaseError::Unauthorized(format!("Bad api_key: {0}", test_api_key.to_string())));

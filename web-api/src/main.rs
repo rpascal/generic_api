@@ -42,8 +42,8 @@ async fn main() -> std::io::Result<()> {
     let args : CliAndEnvArgs = cli_and_env_arguments();
 
     let port = args.port;
-
-    let pool = database::pool::establish_connection(&args.clone().database_url);
+    //&args.clone().database_url
+    let pool = database::pool::establish_connection("http://localhost:8529/", "root", "rootpassword");
 
     let server = HttpServer::new(move || {
         App::new()

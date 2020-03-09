@@ -4,8 +4,8 @@ use crate::errors::ServiceResult;
 use uuid::Uuid;
 use database::{Pool};
 use database::get_request::{find_user_route, get_all_routes, new_endpoint};
-use database::get_request::model::{GetRequest, BasicGetRequest};
 use crate::routes::admin::validate_api_key::get_api_key_from_header_map;
+use models::get_request::{GetRequest, BasicGetRequest};
 
 pub fn route(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/")

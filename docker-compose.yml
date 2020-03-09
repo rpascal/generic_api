@@ -1,39 +1,12 @@
 version: '3.1'
 
 services:
-  pgAdmin:
-    restart: always
-    image: dpage/pgadmin4
-    ports:
-      - "5050:80"
+  arangodb_db_container:
+    image: arangodb:latest
     environment:
-      PGADMIN_DEFAULT_EMAIL: pgadmin@genericapi.com
-      PGADMIN_DEFAULT_PASSWORD: password
-#    volumes:
-#      - ./docker/database/.pgadmin:/var/lib/pgadmin
-    networks:
-      - postgres
-  postgres:
-    restart: always
-    image: postgres
-    command:
-      - 'postgres'
-      - '-c'
-      - 'max_connections=100'
-      - '-c'
-      - 'shared_buffers=256MB'
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: generic_api
-#    volumes:
-#      - ./docker/database/init_scripts:/docker-entrypoint-initdb.d/
-#      - ./docker/database/.data:/var/lib/postgresql/data
+      ARANGO_ROOT_PASSWORD: rootpassword
     ports:
-      - 5432:5432
-    networks:
-      - postgres
-
-networks:
-  postgres:
-    driver: bridge
+      - 8529:8529
+    volumes:
+      - ./docker/arangodb_data_container:/var/lib/arangodb3
+      - ./docker/arangodb_apps_data_container:/var/lib/arangodb3-apps
