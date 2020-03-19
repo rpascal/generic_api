@@ -1,4 +1,5 @@
 use thiserror::Error;
+use failure::AsFail;
 
 #[derive(Debug, Error, Serialize)]
 pub enum DatabaseError {
@@ -21,6 +22,19 @@ pub enum DatabaseError {
 impl From<serde_json::error::Error> for DatabaseError {
     fn from(_: serde_json::error::Error) -> Self {
        DatabaseError::SerializationError
+    }
+}
+
+impl From<arangors::Error> for DatabaseError {
+    fn from(err: arangors::Error) -> Self {
+        let error_msg: String = format!("{:?}", err);
+        DatabaseError::BadRequest(error_msg)    }
+}
+
+impl From<failure::Error> for DatabaseError {
+    fn from(err: failure::Error) -> Self {
+        let error_msg: String = format!("{:?}", err.as_fail());
+        DatabaseError::BadRequest(error_msg)
     }
 }
 

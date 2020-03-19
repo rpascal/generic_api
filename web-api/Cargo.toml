@@ -11,11 +11,11 @@ database = { path = "../database" }
 models = { path = "../models" }
 
 dotenv = "0.15"
-actix-web = {version = "2.0", features = []}
+actix-web = {version = "3.0.0-alpha.1", features = []}
 actix-rt = "1.0"
 futures = "0.3"
 failure = "0.1.6"
-actix-http="1.0.1"
+actix-http="2.0.0-alpha.2"
 actix-service="1.0.5"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 serde = "1.0"
@@ -24,3 +24,4 @@ serde_json = "1.0"
 thiserror = "1.0"
 structopt = "0.3"
 env_logger = "0.7"
+url = "2.1.1"
