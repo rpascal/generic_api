@@ -5,7 +5,7 @@ use uuid::Uuid;
 use database::{Pool};
 use database::get_request::{find_user_route, get_all_routes, new_endpoint};
 use crate::routes::admin::validate_api_key::get_api_key_from_header_map;
-use models::get_request::{GetRequest, BasicGetRequest};
+use models::get_request::{GetRequest, BasicGetRequest, Request};
 use url::Url;
 use std::collections::HashMap;
 use actix_http::http::Uri;
@@ -23,8 +23,11 @@ async fn default_route(_req: HttpRequest, pool: Data<Pool>) -> ServiceResult<Htt
     let path: &str = _req.path();
     let header_api_key: Uuid = get_api_key_from_header_map(_req.headers())?;
     let query_params: HashMap<String, String> = get_query_params(_req.uri())?;
-
-    let response: serde_json::Value = find_user_route::execute(path, query_params, header_api_key, &pool)?;
+    let request: Request = Request {
+        route: String::from(path),
+        query_params
+    };
+    let response: serde_json::Value = find_user_route::execute(&request, header_api_key, &pool)?;
     Ok(HttpResponse::Ok().json(response))
 }
 

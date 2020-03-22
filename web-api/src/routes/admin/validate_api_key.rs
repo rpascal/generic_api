@@ -71,7 +71,6 @@ pub fn get_api_key_from_header_map(header_map: &HeaderMap) -> Result<Uuid, Servi
     return Err(ServiceError::BadRequest(String::from("No header with api_key found")));
 }
 
-
 fn api_key_validation(req: &ServiceRequest, pool: Option<Data<Pool>>) -> Result<(), ServiceError> {
     let header_api_key = get_api_key_from_header_map(req.headers())?;
 
