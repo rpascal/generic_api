@@ -11,4 +11,12 @@ pub(crate) struct CliAndEnvArgs {
     #[structopt(long, env = "DATABASE_URL")]
     pub database_url: String,
 
+    /// Database username
+    #[structopt(long, env = "DATABASE_USERNAME")]
+    pub database_username: String,
+
+    /// Database password
+    #[structopt(long, env = "DATABASE_PASSWORD")]
+    pub database_password: String,
+
 }
