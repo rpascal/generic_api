@@ -6,7 +6,7 @@ use models::get_request::{BasicGetRequest, GetRequest};
 use arangors::AqlQuery;
 use std::collections::HashMap;
 
-pub fn execute(header_api_key: Uuid, query_params: HashMap<String, String>, pool: &Pool, body: BasicGetRequest) -> DatabaseResult<GetRequest> {
+pub fn execute(header_api_key: Uuid, pool: &Pool, body: BasicGetRequest) -> DatabaseResult<GetRequest> {
     let pooled_connection = &db_connection(pool)?;
     let db = &system_db(pooled_connection)?;
 
@@ -14,7 +14,7 @@ pub fn execute(header_api_key: Uuid, query_params: HashMap<String, String>, pool
         api_key: header_api_key,
         route: body.route,
         response: body.response,
-        query_params
+        query_params: body.query_params
     };
 
     let aql = AqlQuery::new("INSERT @get_request INTO get_requests RETURN NEW")

@@ -36,9 +36,8 @@ async fn get_all_routes(_req: HttpRequest, pool: Data<Pool>) -> ServiceResult<Ht
 
 async fn new_endpoint(req: HttpRequest, _pool: Data<Pool>, _body: Json<BasicGetRequest>) -> ServiceResult<HttpResponse>  {
     let header_api_key: Uuid = get_api_key_from_header_map(req.headers())?;
-    let query_params: HashMap<String, String> = get_query_params(req.uri())?;
 
-    match new_endpoint::execute(header_api_key, query_params, &_pool, _body.into_inner()) {
+    match new_endpoint::execute(header_api_key, &_pool, _body.into_inner()) {
         Ok(res) => {
             Ok(HttpResponse::Ok().json(res))
         },

@@ -11,5 +11,6 @@ pub struct GetRequest {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BasicGetRequest {
     pub route: String,
-    pub response: serde_json::Value
+    pub response: serde_json::Value,
+    pub query_params: HashMap<String, String>
 }
